@@ -58,7 +58,9 @@
         playerTeam: $("player-team"),
         streakCount: $("streak-count"),
         streakDots: $("streak-dots"),
-        streakNote: $("streak-note"),
+        streakBlocks: $("streak-blocks"),
+        streakBest: $("streak-best"),
+        streakBestLabel: $("streak-best-label"),
         lastGameMeta: $("last-game-meta"),
         lastGameMatchup: $("last-game-matchup"),
         lastBlk: $("last-blk"),
@@ -358,18 +360,18 @@
       function renderStreak(regularGames) {
         const streak = computeStreak(regularGames);
         els.streakCount.textContent = fmtNumber(streak);
-        const recent = regularGames.filter((g) => g.minutes > 0).slice(0, 15).reverse();
-        els.streakDots.innerHTML = recent
+        const played = regularGames.filter((g) => g.minutes > 0);
+        const streakGames = played.filter((g) => !(g.live && g.blocks < 1)).slice(0, streak);
+        els.streakBlocks.textContent = fmtNumber(streakGames.reduce((sum, g) => sum + g.blocks, 0));
+        const season = regularGames[0]?.season;
+        els.streakBestLabel.textContent = season ? `Longest in ${seasonLabel(season)}` : "Longest this season";
+        els.streakBest.textContent = season ? fmtNumber(longestStreak(regularGames.filter((g) => g.season === season))) : "--";
+        els.streakDots.innerHTML = played.slice(0, 10).reverse()
           .map((game) => {
             const label = `${formatDate(game.date)} ${game.atVs} ${game.opponentAbbr}: ${game.blocks} ${game.blocks === 1 ? "block" : "blocks"}`;
-            return `<li class="${game.blocks > 0 ? "hit" : "miss"}" title="${escapeHtml(label)}"><span class="visually-hidden">${escapeHtml(label)}</span><b aria-hidden="true">${game.blocks}</b></li>`;
+            return `<li class="${game.blocks > 0 ? "hit" : "miss"}" title="${escapeHtml(label)}"><span class="visually-hidden">${escapeHtml(label)}</span><b aria-hidden="true">${game.blocks}</b><small aria-hidden="true">${escapeHtml(game.opponentAbbr)}</small></li>`;
           })
           .join("");
-        const seasonGames = regularGames.filter((g) => g.season === regularGames[0]?.season);
-        const best = longestStreak(seasonGames);
-        els.streakNote.textContent = regularGames.length
-          ? `Longest in ${seasonLabel(regularGames[0].season)}: ${best} games. Regular-season games he played; games he sat out do not break the streak.`
-          : "No regular-season games yet.";
       }
 
       function renderLastGame(game) {

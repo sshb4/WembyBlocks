@@ -62,7 +62,7 @@
           <a href="#streak">Streak</a>
           <a href="#projection">Projection</a>
           <a href="#history">History</a>
-          <a class="nav-cta" href="#sms-alerts">Get alerts</a>
+          <a class="nav-cta" href="#sms-alerts"><span class="nav-long">Get </span>alerts</a>
         </nav>
       </div>
     </header>
@@ -158,9 +158,17 @@
           <div class="section-head">
             <h2 id="streak-heading">Current streak</h2>
           </div>
-          <div class="streak-value"><strong id="streak-count">--</strong><span>straight games with a block</span></div>
-          <ol class="streak-dots" id="streak-dots" aria-label="Blocks in recent games, oldest to newest"></ol>
-          <p class="panel-note" id="streak-note">Regular-season games he played. Games he sat out do not break the streak.</p>
+          <div class="streak-value"><strong id="streak-count">--</strong><span>games in a row with at least one block</span></div>
+          <dl class="streak-facts">
+            <div><dt>Blocks during streak</dt><dd id="streak-blocks">--</dd></div>
+            <div><dt id="streak-best-label">Longest this season</dt><dd id="streak-best">--</dd></div>
+          </dl>
+          <div class="streak-recent-head">
+            <span>Blocks, last 10 games</span>
+            <span aria-hidden="true">older → latest</span>
+          </div>
+          <ol class="streak-dots" id="streak-dots" aria-label="Blocks in his last 10 games, oldest to latest"></ol>
+          <p class="panel-note">Regular season only. Games he sits out don't break the streak.</p>
         </section>
 
         <section class="panel section" aria-labelledby="last-game-heading">
