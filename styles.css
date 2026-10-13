@@ -174,17 +174,9 @@
       .hero,
       .projection,
       .history,
+      .about,
       .site-footer {
         grid-column: 1 / -1;
-      }
-
-      .about,
-      .news {
-        grid-column: span 1;
-      }
-
-      .news {
-        grid-column: span 2;
       }
 
       .panel {
@@ -554,6 +546,11 @@
         color: var(--loss) !important;
       }
 
+      .result-live {
+        color: var(--accent) !important;
+        font-weight: 700;
+      }
+
       .last-game-stats {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -880,38 +877,7 @@
         color: var(--muted);
       }
 
-      /* ---- News & about --------------------------------------------- */
-
-      .news-list {
-        display: grid;
-        gap: 4px;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-      }
-
-      .news-list li {
-        display: flex;
-        justify-content: space-between;
-        gap: 14px;
-        padding: 8px 0;
-        border-bottom: 1px solid var(--soft);
-      }
-
-      .news-list a {
-        text-decoration: none;
-      }
-
-      .news-list a:hover {
-        color: var(--accent-bright);
-        text-decoration: underline;
-      }
-
-      .news-list span {
-        flex-shrink: 0;
-        color: var(--muted);
-        font-size: 0.8rem;
-      }
+      /* ---- About ----------------------------------------------------- */
 
       .about p {
         margin: 0 0 10px;
@@ -1073,10 +1039,6 @@
         .grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
         }
-
-        .news {
-          grid-column: 1 / -1;
-        }
       }
 
       @media (max-width: 720px) {
@@ -1094,11 +1056,6 @@
 
         .grid {
           grid-template-columns: minmax(0, 1fr);
-        }
-
-        .about,
-        .news {
-          grid-column: 1 / -1;
         }
 
         .hero {
@@ -1128,11 +1085,6 @@
 
         .sms-form-row {
           flex-direction: column;
-        }
-
-        .news-list li {
-          flex-direction: column;
-          gap: 2px;
         }
 
         .game-log th:nth-child(3),

@@ -80,7 +80,6 @@
         allTimeLeaders: $("all-time-leaders"),
         seasonLeaders: $("season-leaders"),
         seasonLeadersLabel: $("season-leaders-label"),
-        newsList: $("news-list"),
       };
 
       let refreshTimer = null;
@@ -241,7 +240,7 @@
       function computeStreak(regularGames) {
         let streak = 0;
         for (const game of regularGames) {
-          if (game.minutes <= 0) continue;
+          if (game.minutes <= 0 || (game.live && game.blocks < 1)) continue;
           if (game.blocks < 1) break;
           streak += 1;
         }
@@ -257,6 +256,68 @@
           best = Math.max(best, run);
         }
         return best;
+      }
+
+      // ---- Live game ------------------------------------------------------
+
+      // The summary endpoint's box score updates within seconds; the game log
+      // and career stats can lag a live game by many minutes.
+      function parseLiveGame(summary, season) {
+        const competition = summary?.header?.competitions?.[0];
+        if (summary?.header?.season?.type !== 2) return null;
+        if ((competition?.notes || []).some((n) => NON_COUNTING_GAME.test(n?.headline || ""))) return null;
+        const state = competition?.status?.type?.state;
+        if (state !== "in" && state !== "post") return null;
+        const team = summary.boxscore?.players?.find((t) => String(t.team?.id) === TEAM_ID);
+        const table = team?.statistics?.[0];
+        const keys = table?.keys || table?.names || [];
+        const row = table?.athletes?.find((a) => String(a.athlete?.id) === ATHLETE_ID);
+        if (!row || row.didNotPlay || !row.stats?.length) return null;
+        const stat = (key) => parseNumber(row.stats[keys.indexOf(key)]);
+        const us = competition.competitors.find((c) => String(c.team?.id) === TEAM_ID);
+        const them = competition.competitors.find((c) => String(c.team?.id) !== TEAM_ID);
+        const scores = [parseNumber(us?.score), parseNumber(them?.score)];
+        return {
+          id: String(summary.header.id),
+          season,
+          type: "regular",
+          live: state === "in",
+          round: "",
+          date: competition.date,
+          opponent: them?.team?.displayName || "Opponent",
+          opponentAbbr: them?.team?.abbreviation || "",
+          opponentLogo: them?.team?.logos?.[0]?.href || them?.team?.logo || "",
+          atVs: us?.homeAway === "home" ? "vs." : "@",
+          result: state === "in" ? "Live" : us?.winner ? "W" : "L",
+          score: `${Math.max(...scores)}-${Math.min(...scores)}`,
+          minutes: stat("minutes"),
+          points: stat("points"),
+          rebounds: stat("rebounds"),
+          blocks: stat("blocks"),
+        };
+      }
+
+      async function loadLiveGames(ids, season) {
+        const games = await Promise.all(ids.map(async (id) => {
+          try {
+            return parseLiveGame(await fetchJson(`${ESPN_SITE}/summary?event=${encodeURIComponent(id)}`), season);
+          } catch (error) {
+            console.warn("Live game check failed", id, error);
+            return null;
+          }
+        }));
+        return games.filter(Boolean);
+      }
+
+      // A live box score replaces the game log's row for the same game, keeping the higher count.
+      function mergeLiveGames(games, liveGames) {
+        const merged = [...(games || [])];
+        for (const live of liveGames) {
+          const index = merged.findIndex((g) => g.id === live.id);
+          if (index < 0) merged.push(live);
+          else if (live.live || live.blocks >= merged[index].blocks) merged[index] = { ...merged[index], ...live };
+        }
+        return merged.sort((a, b) => new Date(b.date) - new Date(a.date));
       }
 
       // ---- Hero -----------------------------------------------------------
@@ -400,6 +461,7 @@
         const rows = totals.statistics.map((row, i) => {
           const avg = averages?.statistics?.[i]?.stats || [];
           return {
+            year: parseNumber(row.season?.year),
             label: row.season?.displayName || String(row.season?.year || ""),
             blocks: parseNumber(row.stats[blkIndex]),
             games: gpIndex >= 0 ? parseNumber(avg[gpIndex]) : null,
@@ -422,7 +484,7 @@
               <td class="num">${fmtDecimal(parseNumber(averages?.totals?.[bpgIndex]))}</td>
               <td class="num blk">${fmtNumber(parseNumber(totals.totals?.[blkIndex]))}</td>
             </tr>`;
-        return parseNumber(totals.totals?.[blkIndex]);
+        return rows;
       }
 
       function renderAllTime(careerBlocks) {
@@ -440,7 +502,17 @@
             : "");
       }
 
+      // Leaders 404 until a few games into a new season; fall back to the previous one.
       async function renderSeasonLeaders(season) {
+        try {
+          return { season, rank: await renderSeasonLeadersFor(season) };
+        } catch (error) {
+          console.warn(`No ${seasonLabel(season)} leaders yet`, error);
+          return { season: season - 1, rank: await renderSeasonLeadersFor(season - 1) };
+        }
+      }
+
+      async function renderSeasonLeadersFor(season) {
         const payload = await fetchCached(`${ESPN_CORE}/seasons/${season}/types/2/leaders`, COMPLETED_CACHE_MS);
         const category = payload?.categories?.find((c) => c.name === "blocksPerGame");
         if (!category?.leaders?.length) throw new Error("No blocks leaders");
@@ -468,30 +540,21 @@
         return wemby >= 0 ? wemby + 1 : null;
       }
 
-      async function renderNews() {
-        const payload = await fetchJson(`${ESPN_SITE}/news?team=${TEAM_ID}&limit=6`);
-        const articles = (payload?.articles || [])
-          .filter((a) => a.headline && a.links?.web?.href?.startsWith("https://"))
-          .slice(0, 5);
-        els.newsList.innerHTML = articles.length
-          ? articles
-              .map((a) => `
-                <li>
-                  <a href="${escapeHtml(a.links.web.href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(a.headline)}</a>
-                  <span>${a.type === "Media" ? "Video · " : ""}${formatDate(a.published)}</span>
-                </li>`)
-              .join("")
-          : `<li class="empty">No recent news.</li>`;
-      }
-
       async function renderBanner(season) {
         const payload = await fetchJson(`${ESPN_SITE}/teams/${TEAM_ID}/schedule?season=${season}&seasontype=2`);
         const events = payload?.events || [];
         const next = events.find((e) => e.competitions?.[0]?.status?.type?.state !== "post");
         const played = events.filter((e) => e.competitions?.[0]?.status?.type?.completed).length;
+        // Live games, plus games that ended in the last 8 hours (the game log can lag the final).
+        const liveIds = events
+          .filter((e) => {
+            const state = e.competitions?.[0]?.status?.type?.state;
+            return state === "in" || (state === "post" && Date.now() - new Date(e.date) < 8 * 60 * 60 * 1000);
+          })
+          .map((e) => String(e.id));
         if (!next) {
           els.banner.hidden = true;
-          return { played, total: events.length };
+          return { played, total: events.length, liveIds };
         }
         const competitors = next.competitions[0].competitors || [];
         const opponent = competitors.find((c) => String(c.team?.id) !== TEAM_ID)?.team;
@@ -505,7 +568,7 @@
             ? `${seasonLabel(season)} tips off ${when} ${matchup}`
             : `Next game: ${when} ${matchup}`;
         els.banner.hidden = false;
-        return { played, total: events.length };
+        return { played, total: events.length, liveIds };
       }
 
       // ---- Projection chart ---------------------------------------------
@@ -644,6 +707,76 @@
         els.error.hidden = false;
       }
 
+      let gameState = null;
+      let liveTimer = null;
+      const LIVE_REFRESH_MS = 30 * 1000;
+
+      function renderGameState() {
+        const state = gameState;
+        const currentGames = state.currentGames ? mergeLiveGames(state.currentGames, state.liveGames) : null;
+        const previousGames = state.previousGames;
+        const season = state.season;
+
+        const currentBlocks = (currentGames || [])
+          .filter((g) => g.type === "regular")
+          .reduce((sum, g) => sum + g.blocks, 0);
+        const computed = state.priorBlocks != null && currentGames ? state.priorBlocks + currentBlocks : null;
+        // Use whichever source is further along; the core total can trail by 15+ minutes.
+        const careerBlocks = Math.max(state.coreCareer ?? -1, computed ?? -1);
+        if (careerBlocks < 0) throw new Error("Career blocks unavailable");
+        const careerBpg = state.careerBpg ??
+          (state.careerGames ? careerBlocks / state.careerGames : null);
+
+        renderChase(careerBlocks);
+        els.careerBpg.textContent = fmtDecimal(careerBpg);
+        els.careerGames.textContent = state.careerGames == null ? "--" : `${fmtNumber(state.careerGames)} games`;
+        renderMilestones(careerBlocks, careerBpg);
+        renderAllTime(careerBlocks);
+        if (careerBpg) renderProjection(careerBlocks, careerBpg, season, state.progress);
+
+        // Before the new season's first game, the log and season stats show last season.
+        const seasonGames = currentGames?.some((g) => g.type === "regular") ? currentGames : previousGames || [];
+        const activeSeason = seasonGames === currentGames ? season : season - 1;
+        const regular = seasonGames.filter((g) => g.type === "regular");
+        const streakGames = [
+          ...regular,
+          ...(seasonGames === currentGames ? (previousGames || []).filter((g) => g.type === "regular") : []),
+        ];
+        latestGames = regular;
+        els.gameLogSeason.textContent = seasonLabel(activeSeason);
+        renderGameLog();
+        renderStreak(streakGames);
+        renderLastGame([...(currentGames || []), ...(previousGames || [])]
+          .sort((a, b) => new Date(b.date) - new Date(a.date))[0]);
+
+        const seasonBlocks = regular.reduce((sum, g) => sum + g.blocks, 0);
+        els.seasonKpiLabel.textContent = activeSeason === season ? "This season" : seasonLabel(activeSeason);
+        els.seasonBpgLabel.textContent = `${seasonLabel(activeSeason)} per game`;
+        els.seasonBlocks.textContent = fmtNumber(seasonBlocks);
+        els.seasonGames.textContent = `${fmtNumber(regular.length)} ${regular.length === 1 ? "game" : "games"}`;
+        els.seasonBpg.textContent = regular.length ? fmtDecimal(seasonBlocks / regular.length) : "--";
+        return { activeSeason };
+      }
+
+      // While a Spurs game is live, re-read only its box score every 30 seconds.
+      function scheduleLiveRefresh() {
+        window.clearTimeout(liveTimer);
+        if (!gameState?.liveGames.some((g) => g.live)) return;
+        liveTimer = window.setTimeout(async () => {
+          if (document.visibilityState === "visible" && !loading) {
+            const liveGames = await loadLiveGames(gameState.liveIds, gameState.season);
+            if (liveGames.length) gameState.liveGames = liveGames;
+            try {
+              renderGameState();
+              lastLoadedAt = new Date();
+            } catch (error) {
+              console.error(error);
+            }
+          }
+          scheduleLiveRefresh();
+        }, LIVE_REFRESH_MS);
+      }
+
       async function loadData() {
         if (loading) return;
         loading = true;
@@ -673,59 +806,40 @@
             attempt("schedule", () => renderBanner(season)),
           ]);
 
-          // Career total: the core API is primary; the year-by-year totals back it up.
-          let byYearTotal = null;
+          let byYearRows = null;
           if (yearByYear) {
-            byYearTotal = await attempt("by season", () => renderByYear(yearByYear));
+            byYearRows = await attempt("by season", () => renderByYear(yearByYear));
           } else {
             els.byYear.innerHTML = `<tr><td colspan="4" class="empty">No data.</td></tr>`;
           }
-          const careerBlocks = coreStat(career, "defensive", "blocks") ?? byYearTotal;
-          const careerGames = coreStat(career, "general", "gamesPlayed");
-          const careerBpg = coreStat(career, "defensive", "avgBlocks") ??
-            (careerBlocks && careerGames ? careerBlocks / careerGames : null);
-
-          if (careerBlocks == null) throw new Error("Career blocks unavailable");
-          renderChase(careerBlocks);
-          els.careerBpg.textContent = fmtDecimal(careerBpg);
-          els.careerGames.textContent = careerGames == null ? "--" : `${fmtNumber(careerGames)} games`;
-          renderMilestones(careerBlocks, careerBpg);
-          renderAllTime(careerBlocks);
-          if (careerBpg) renderProjection(careerBlocks, careerBpg, season, progress);
-
           if (profile) {
             els.playerAge.textContent = profile.age ?? "--";
             els.playerTeam.textContent = `#${profile.jersey ?? "1"} · San Antonio Spurs`;
           }
 
-          // Before the new season's first game, the log and season stats show last season.
-          const seasonGames = currentGames?.some((g) => g.type === "regular") ? currentGames : previousGames || [];
-          const activeSeason = seasonGames === currentGames ? season : season - 1;
-          const regular = seasonGames.filter((g) => g.type === "regular");
-          const streakGames = [
-            ...regular,
-            ...(seasonGames === currentGames ? (previousGames || []).filter((g) => g.type === "regular") : []),
-          ];
-          latestGames = regular;
-          els.gameLogSeason.textContent = seasonLabel(activeSeason);
-          renderGameLog();
-          renderStreak(streakGames);
-          renderLastGame([...(currentGames || []), ...(previousGames || [])]
-            .sort((a, b) => new Date(b.date) - new Date(a.date))[0]);
+          const liveIds = progress?.liveIds || [];
+          gameState = {
+            season,
+            progress,
+            coreCareer: coreStat(career, "defensive", "blocks"),
+            careerGames: coreStat(career, "general", "gamesPlayed"),
+            careerBpg: coreStat(career, "defensive", "avgBlocks"),
+            // Finished seasons from the by-season table; the current season is counted game by game.
+            priorBlocks: byYearRows
+              ? byYearRows.filter((r) => r.year && r.year < season).reduce((sum, r) => sum + r.blocks, 0)
+              : null,
+            currentGames,
+            previousGames,
+            liveIds,
+            liveGames: await loadLiveGames(liveIds, season),
+          };
+          const { activeSeason } = renderGameState();
+          scheduleLiveRefresh();
 
-          const seasonBlocks = regular.reduce((sum, g) => sum + g.blocks, 0);
-          els.seasonKpiLabel.textContent = activeSeason === season ? "This season" : seasonLabel(activeSeason);
-          els.seasonBpgLabel.textContent = `${seasonLabel(activeSeason)} per game`;
-          els.seasonBlocks.textContent = fmtNumber(seasonBlocks);
-          els.seasonGames.textContent = `${fmtNumber(regular.length)} games`;
-          els.seasonBpg.textContent = regular.length ? fmtDecimal(seasonBlocks / regular.length) : "--";
-
-          const [rank] = await Promise.all([
-            attempt("leaders", () => renderSeasonLeaders(activeSeason)),
-            attempt("news", renderNews),
-          ]);
+          const leaders = await attempt("leaders", () => renderSeasonLeaders(activeSeason));
+          const rank = leaders?.season === activeSeason ? leaders.rank : null;
           els.seasonRank.textContent = rank ? `#${rank} in the NBA` : "--";
-          if (!rank) els.seasonLeaders.innerHTML = `<li class="empty">No data.</li>`;
+          if (!leaders) els.seasonLeaders.innerHTML = `<li class="empty">No data.</li>`;
 
           lastLoadedAt = new Date();
           els.status.textContent = `Updated ${timeAgoLabel(lastLoadedAt)}`;
