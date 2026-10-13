@@ -524,6 +524,7 @@
       .streak-recent-head {
         display: flex;
         justify-content: space-between;
+        gap: 10px;
         margin: 16px 0 6px;
         color: var(--muted);
         font-size: 0.72rem;
@@ -531,9 +532,14 @@
         text-transform: uppercase;
       }
 
+      .streak-recent-head span:last-child {
+        flex-shrink: 0;
+        white-space: nowrap;
+      }
+
       .streak-dots {
         display: grid;
-        grid-template-columns: repeat(10, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(32px, 1fr));
         gap: 4px;
         margin: 0;
         padding: 0;
@@ -549,6 +555,11 @@
         background: var(--soft);
         color: var(--muted);
         font-variant-numeric: tabular-nums;
+      }
+
+      .streak-dots li.empty {
+        grid-column: 1 / -1;
+        background: none;
       }
 
       .streak-dots b {

@@ -366,12 +366,12 @@
         const season = regularGames[0]?.season;
         els.streakBestLabel.textContent = season ? `Longest in ${seasonLabel(season)}` : "Longest this season";
         els.streakBest.textContent = season ? fmtNumber(longestStreak(regularGames.filter((g) => g.season === season))) : "--";
-        els.streakDots.innerHTML = played.slice(0, 10).reverse()
+        els.streakDots.innerHTML = streakGames.length ? [...streakGames].reverse()
           .map((game) => {
             const label = `${formatDate(game.date)} ${game.atVs} ${game.opponentAbbr}: ${game.blocks} ${game.blocks === 1 ? "block" : "blocks"}`;
             return `<li class="${game.blocks > 0 ? "hit" : "miss"}" title="${escapeHtml(label)}"><span class="visually-hidden">${escapeHtml(label)}</span><b aria-hidden="true">${game.blocks}</b><small aria-hidden="true">${escapeHtml(game.opponentAbbr)}</small></li>`;
           })
-          .join("");
+          .join("") : `<li class="empty">No active streak.</li>`;
       }
 
       function renderLastGame(game) {
