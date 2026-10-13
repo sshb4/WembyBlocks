@@ -1,0 +1,258 @@
+{
+ "header": {
+  "id": "401809235",
+  "season": {
+   "year": 2026,
+   "current": false,
+   "type": 2
+  },
+  "competitions": [
+   {
+    "notes": [],
+    "status": {
+     "type": {
+      "id": "3",
+      "name": "STATUS_FINAL",
+      "state": "post",
+      "completed": true,
+      "description": "Final",
+      "detail": "Final",
+      "shortDetail": "Final"
+     }
+    },
+    "competitors": [
+     {
+      "homeAway": "home",
+      "team": {
+       "id": "6",
+       "name": "Mavericks",
+       "displayName": "Dallas Mavericks",
+       "abbreviation": "DAL"
+      }
+     },
+     {
+      "homeAway": "away",
+      "team": {
+       "id": "24",
+       "name": "Spurs",
+       "displayName": "San Antonio Spurs",
+       "abbreviation": "SA"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "plays": [
+  {
+   "id": "40180923512",
+   "sequenceNumber": "12",
+   "type": {
+    "id": "44",
+    "text": "Shooting Foul"
+   },
+   "text": "P.J. Washington shooting foul",
+   "awayScore": 0,
+   "homeScore": 2,
+   "period": {
+    "number": 1,
+    "displayValue": "1st Quarter"
+   },
+   "clock": {
+    "displayValue": "11:20"
+   },
+   "scoringPlay": false,
+   "scoreValue": 0,
+   "team": {
+    "id": "6"
+   },
+   "participants": [
+    {
+     "athlete": {
+      "id": "4278078"
+     }
+    }
+   ],
+   "wallclock": "2025-10-23T01:48:54Z",
+   "shootingPlay": false,
+   "coordinate": {
+    "x": 39,
+    "y": 8
+   },
+   "pointsAttempted": 0,
+   "shortDescription": "Foul"
+  },
+  {
+   "id": "40180923546",
+   "sequenceNumber": "46",
+   "type": {
+    "id": "95",
+    "text": "Layup Shot"
+   },
+   "text": "Victor Wembanyama blocks Anthony Davis 's 4-foot layup",
+   "awayScore": 9,
+   "homeScore": 8,
+   "period": {
+    "number": 1,
+    "displayValue": "1st Quarter"
+   },
+   "clock": {
+    "displayValue": "8:30"
+   },
+   "scoringPlay": false,
+   "scoreValue": 0,
+   "team": {
+    "id": "6"
+   },
+   "participants": [
+    {
+     "athlete": {
+      "id": "6583"
+     }
+    },
+    {
+     "athlete": {
+      "id": "5104157"
+     }
+    }
+   ],
+   "wallclock": "2025-10-23T01:54:03Z",
+   "shootingPlay": true,
+   "coordinate": {
+    "x": 21,
+    "y": 1
+   },
+   "pointsAttempted": 2,
+   "shortDescription": "Missed FG"
+  },
+  {
+   "id": "401809235142",
+   "sequenceNumber": "142",
+   "type": {
+    "id": "144",
+    "text": "Driving Floating Jump Shot"
+   },
+   "text": "Luke Kornet blocks Naji Marshall 's 5-foot driving floating jump shot",
+   "awayScore": 23,
+   "homeScore": 24,
+   "period": {
+    "number": 1,
+    "displayValue": "1st Quarter"
+   },
+   "clock": {
+    "displayValue": "2:44"
+   },
+   "scoringPlay": false,
+   "scoreValue": 0,
+   "team": {
+    "id": "6"
+   },
+   "participants": [
+    {
+     "athlete": {
+      "id": "4278594"
+     }
+    },
+    {
+     "athlete": {
+      "id": "3064560"
+     }
+    }
+   ],
+   "wallclock": "2025-10-23T02:14:56Z",
+   "shootingPlay": true,
+   "coordinate": {
+    "x": 27,
+    "y": 6
+   },
+   "pointsAttempted": 2,
+   "shortDescription": "Missed FG"
+  },
+  {
+   "id": "401809235405",
+   "sequenceNumber": "405",
+   "type": {
+    "id": "109",
+    "text": "Running Layup Shot"
+   },
+   "text": "Victor Wembanyama blocks Cooper Flagg 's 3-foot two point shot",
+   "awayScore": 60,
+   "homeScore": 53,
+   "period": {
+    "number": 3,
+    "displayValue": "3rd Quarter"
+   },
+   "clock": {
+    "displayValue": "11:10"
+   },
+   "scoringPlay": false,
+   "scoreValue": 0,
+   "team": {
+    "id": "6"
+   },
+   "participants": [
+    {
+     "athlete": {
+      "id": "5041939"
+     }
+    },
+    {
+     "athlete": {
+      "id": "5104157"
+     }
+    }
+   ],
+   "wallclock": "2025-10-23T03:17:29Z",
+   "shootingPlay": true,
+   "coordinate": {
+    "x": 28,
+    "y": 2
+   },
+   "pointsAttempted": 2,
+   "shortDescription": "Missed FG"
+  },
+  {
+   "id": "401809235425",
+   "sequenceNumber": "425",
+   "type": {
+    "id": "93",
+    "text": "Hook Shot"
+   },
+   "text": "Victor Wembanyama blocks Dereck Lively II 's 1-foot hook shot",
+   "awayScore": 67,
+   "homeScore": 57,
+   "period": {
+    "number": 3,
+    "displayValue": "3rd Quarter"
+   },
+   "clock": {
+    "displayValue": "9:01"
+   },
+   "scoringPlay": false,
+   "scoreValue": 0,
+   "team": {
+    "id": "6"
+   },
+   "participants": [
+    {
+     "athlete": {
+      "id": "4683688"
+     }
+    },
+    {
+     "athlete": {
+      "id": "5104157"
+     }
+    }
+   ],
+   "wallclock": "2025-10-23T03:19:50Z",
+   "shootingPlay": true,
+   "coordinate": {
+    "x": 24,
+    "y": 2
+   },
+   "pointsAttempted": 2,
+   "shortDescription": "Missed FG"
+  }
+ ]
+}

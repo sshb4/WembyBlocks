@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wemby Blocks | Victor Wembanyama's Chase for the Blocks Record</title>
+    <meta
+      name="description"
+      content="Track Victor Wembanyama's pursuit of Hakeem Olajuwon's all-time NBA blocks record: career blocks, block streak, game log, milestones, and career projections."
+    />
+    <link rel="canonical" href="https://wembyblocks.com/" />
+    <meta name="theme-color" content="#0b0b0c" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Wemby Blocks" />
+    <meta property="og:title" content="Wemby Blocks | Chasing 3,830" />
+    <meta property="og:description" content="Tracking Victor Wembanyama's pursuit of the NBA's all-time blocks record." />
+    <meta property="og:url" content="https://wembyblocks.com/" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://wembyblocks.com/#website",
+            "url": "https://wembyblocks.com/",
+            "name": "Wemby Blocks",
+            "alternateName": "Victor Wembanyama Blocks Tracker",
+            "inLanguage": "en"
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://wembyblocks.com/#webpage",
+            "url": "https://wembyblocks.com/",
+            "name": "Wemby Blocks | Victor Wembanyama's Chase for the Blocks Record",
+            "description": "Career blocks, block streak, game log, milestones, and projections for Victor Wembanyama's chase of Hakeem Olajuwon's all-time NBA blocks record.",
+            "isPartOf": { "@id": "https://wembyblocks.com/#website" },
+            "about": { "@type": "Person", "name": "Victor Wembanyama" },
+            "inLanguage": "en"
+          }
+        ]
+      }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="analytics.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="#top" aria-label="Wemby Blocks home">
+          <img src="favicon.svg?v=1" alt="" width="28" height="28" />
+          <span>Wemby<strong>Blocks</strong></span>
+        </a>
+        <nav class="site-nav" aria-label="Sections">
+          <a href="#stats">Stats</a>
+          <a href="#streak">Streak</a>
+          <a href="#history">History</a>
+          <a href="#news">News</a>
+          <a href="#about">About</a>
+          <a class="nav-cta" href="#sms-alerts">Get alerts</a>
+        </nav>
+      </div>
+    </header>
+    <div class="season-banner" id="season-banner" hidden></div>
+
+    <div class="wrap" id="top">
+      <main class="grid" id="stats">
+        <section class="panel hero" aria-labelledby="hero-kicker">
+          <div class="hero-status">
+            <span id="status">Loading...</span>
+            <button
+              id="refresh-button"
+              class="hero-refresh"
+              type="button"
+              aria-label="Refresh NBA data"
+              title="Refresh NBA data"
+            >&#8635;</button>
+          </div>
+
+          <div class="hero-body">
+            <div class="hero-main">
+              <p class="tagline">A higher standard</p>
+              <h1 class="hero-kicker" id="hero-kicker">Career blocks</h1>
+              <div class="hero-number" id="hero-number" aria-live="polite">
+                <span id="number-main">0</span>
+              </div>
+              <p class="hero-sub">
+                Tracking Victor Wembanyama's pursuit of the NBA's all-time blocks record.
+              </p>
+
+              <div class="chase" aria-labelledby="chase-label">
+                <div class="chase-head">
+                  <span id="chase-label"><strong id="chase-current">--</strong> of 3,830</span>
+                  <span id="chase-percent">--%</span>
+                </div>
+                <div
+                  class="chase-bar"
+                  id="chase-bar"
+                  role="progressbar"
+                  aria-label="Progress toward Hakeem Olajuwon's record of 3,830 blocks"
+                  aria-valuemin="0"
+                  aria-valuemax="3830"
+                  aria-valuenow="0"
+                >
+                  <span id="chase-fill"></span>
+                </div>
+                <div class="chase-foot">
+                  <span id="chase-remaining">-- to tie Hakeem Olajuwon</span>
+                  <span class="chase-record">Record: Hakeem Olajuwon, 1984–2002</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hero-art-spot">
+              <img
+                class="hero-player-art"
+                src="./wemby.png"
+                alt=""
+                aria-hidden="true"
+                onerror="this.closest('.hero-art-spot').classList.add('no-art')"
+              />
+              <p class="hero-quote">“It's just the beginning.”</p>
+            </div>
+          </div>
+
+          <div class="kpis" aria-label="Snapshot numbers">
+            <div class="kpi">
+              <div class="kpi-label" id="season-kpi-label">This season</div>
+              <div class="kpi-value" id="season-blocks">--</div>
+              <div class="kpi-sub" id="season-games">-- games</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Career per game</div>
+              <div class="kpi-value" id="career-bpg">--</div>
+              <div class="kpi-sub" id="career-games">-- games</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label" id="season-bpg-label">Season per game</div>
+              <div class="kpi-value" id="season-bpg">--</div>
+              <div class="kpi-sub" id="season-rank">--</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Age</div>
+              <div class="kpi-value" id="player-age">--</div>
+              <div class="kpi-sub" id="player-team">San Antonio Spurs</div>
+            </div>
+          </div>
+
+          <div class="error" id="error" hidden></div>
+        </section>
+
+        <section class="panel section" id="streak" aria-labelledby="streak-heading">
+          <div class="section-head">
+            <h2 id="streak-heading">Current streak</h2>
+          </div>
+          <div class="streak-value"><strong id="streak-count">--</strong><span>straight games with a block</span></div>
+          <ol class="streak-dots" id="streak-dots" aria-label="Blocks in recent games, oldest to newest"></ol>
+          <p class="panel-note" id="streak-note">Regular-season games he played. Games he sat out do not break the streak.</p>
+        </section>
+
+        <section class="panel section" aria-labelledby="last-game-heading">
+          <div class="section-head">
+            <h2 id="last-game-heading">Last game</h2>
+            <span class="section-meta" id="last-game-meta"></span>
+          </div>
+          <div class="last-game-matchup" id="last-game-matchup">--</div>
+          <dl class="last-game-stats">
+            <div class="featured"><dt>Blocks</dt><dd id="last-blk">--</dd></div>
+            <div><dt>Points</dt><dd id="last-pts">--</dd></div>
+            <div><dt>Rebounds</dt><dd id="last-reb">--</dd></div>
+            <div><dt>Minutes</dt><dd id="last-min">--</dd></div>
+          </dl>
+          <p class="panel-note" id="last-game-note"></p>
+        </section>
+
+        <section class="panel section" aria-labelledby="milestones-heading">
+          <div class="section-head">
+            <h2 id="milestones-heading">Next milestones</h2>
+          </div>
+          <ol class="milestones" id="milestones">
+            <li class="empty">...</li>
+          </ol>
+          <p class="panel-note">Games estimate uses his career blocks per game.</p>
+        </section>
+
+        <section class="panel section projection" id="projection" aria-labelledby="projection-heading">
+          <div class="section-head">
+            <h2 id="projection-heading">Career projection</h2>
+          </div>
+          <ul class="chart-legend" id="projection-legend"></ul>
+          <div class="chart" id="projection-chart"></div>
+          <div class="chart-tooltip" id="projection-tooltip" hidden></div>
+          <ul class="projection-summary" id="projection-summary"></ul>
+          <details class="chart-table">
+            <summary>Show as table</summary>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Season</th><th>High</th><th>Mid</th><th>Conservative</th></tr></thead>
+                <tbody id="projection-table"></tbody>
+              </table>
+            </div>
+          </details>
+          <p class="panel-note" id="projection-note"></p>
+        </section>
+
+        <section class="panel section history" id="history" aria-labelledby="history-heading">
+          <div class="section-head">
+            <h2 id="history-heading">Game log</h2>
+            <span class="section-meta" id="game-log-season"></span>
+          </div>
+          <div class="table-wrap">
+            <table class="game-log">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Opponent</th>
+                  <th>Result</th>
+                  <th class="num">MIN</th>
+                  <th class="num">PTS</th>
+                  <th class="num">REB</th>
+                  <th class="num">BLK</th>
+                </tr>
+              </thead>
+              <tbody id="game-log">
+                <tr><td colspan="7" class="empty">...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <button class="text-button" id="game-log-toggle" type="button" hidden>Show full season</button>
+        </section>
+
+        <section class="panel section" aria-labelledby="by-year-heading">
+          <div class="section-head">
+            <h2 id="by-year-heading">By season</h2>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Season</th>
+                  <th class="num">GP</th>
+                  <th class="num">BPG</th>
+                  <th class="num">BLK</th>
+                </tr>
+              </thead>
+              <tbody id="by-year">
+                <tr><td colspan="4" class="empty">...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel section" aria-labelledby="all-time-heading">
+          <div class="section-head">
+            <h2 id="all-time-heading">All-time blocks leaders</h2>
+          </div>
+          <ol class="leaderboard-list" id="all-time-leaders">
+            <li class="empty">...</li>
+          </ol>
+          <p class="panel-note">Regular-season career totals. Blocks became an official NBA stat in 1973–74.</p>
+        </section>
+
+        <section class="panel section" aria-labelledby="season-leaders-heading">
+          <div class="section-head">
+            <h2 id="season-leaders-heading">Blocks per game leaders</h2>
+            <span class="section-meta" id="season-leaders-label"></span>
+          </div>
+          <ol class="leaderboard-list" id="season-leaders">
+            <li class="empty">...</li>
+          </ol>
+        </section>
+
+        <section class="panel section news" id="news" aria-labelledby="news-heading">
+          <div class="section-head">
+            <h2 id="news-heading">Spurs news</h2>
+            <span class="section-meta">via ESPN</span>
+          </div>
+          <ul class="news-list" id="news-list">
+            <li class="empty">...</li>
+          </ul>
+        </section>
+
+        <section class="panel section about" id="about" aria-labelledby="about-heading">
+          <div class="section-head">
+            <h2 id="about-heading">About</h2>
+          </div>
+          <p>Wemby Blocks follows one number: Victor Wembanyama's career regular-season blocks, measured against Hakeem Olajuwon's all-time record of 3,830. Stats refresh every five minutes from ESPN's public NBA data. Playoff, All-Star, and NBA Cup Championship games do not count toward the record and are left out of the streak and game log.</p>
+          <p>Wemby Blocks is an independent fan project and is not affiliated with the NBA, the San Antonio Spurs, or Victor Wembanyama.</p>
+        </section>
+
+        <footer class="site-footer">
+          <section id="sms-alerts" class="section block-alerts" aria-labelledby="alerts-heading">
+            <div class="alerts-copy">
+              <h2 id="alerts-heading">Block alerts</h2>
+              <p>He blocks it. You get a text.</p>
+              <p>SMS alerts are optional. View all the stats without an account, phone number, or text alerts.</p>
+              <p>Sign up before launch to save your number. We will send a confirmation text after alerts launch; reply YES to activate. No texts are sent when you submit now.</p>
+            </div>
+            <form id="sms-form" class="sms-form" aria-describedby="sms-form-status sms-disclosure">
+              <label for="sms-phone">Your phone number <span>(US only)</span></label>
+              <div class="sms-form-row">
+                <input id="sms-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="25" placeholder="(210) 555-0123" aria-describedby="sms-form-status" />
+                <button id="sms-form-submit" class="sms-button" type="submit" disabled>Continue without texts</button>
+              </div>
+              <p id="sms-form-status" class="sms-form-status" role="status" aria-live="polite" aria-atomic="true" tabindex="-1">Enable JavaScript and complete the security check to save your signup request.</p>
+              <label class="sms-consent" for="sms-consent">
+                <input id="sms-consent" name="consent" type="checkbox" />
+                <span>Optional: I agree to receive recurring automated Wemby Blocks alerts at the phone number entered above. Consent is not required to view stats or make a purchase.</span>
+              </label>
+              <p id="sms-disclosure" class="sms-disclosure">After launch, reply YES to your confirmation text to activate. Frequency varies (about 3 texts per game day). Message and data rates may apply. STOP to cancel, HELP for help. <a href="/sms-terms/">Terms</a> · <a href="/sms-privacy/">Privacy</a></p>
+              <p class="sms-skip"><a href="#stats">Continue without texts — view the stats</a></p>
+              <div id="sms-turnstile"></div>
+              <noscript><p>Enable JavaScript to use this signup form.</p></noscript>
+            </form>
+          </section>
+          <div class="tip-row">
+            <a class="tip-link" href="https://ko-fi.com/P1S7270J56" target="_blank" rel="noopener noreferrer" aria-label="Tip jar on Ko-fi (opens in a new tab)">
+              <svg class="tip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h12v7a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V7Z"/><path d="M16 8h2a3 3 0 0 1 0 6h-2M3 22h16M8 2v2m4-2v2"/></svg>
+              Tip jar <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+          <p class="disclaimer">Wemby Blocks is an independent fan project and is not affiliated with the NBA, the San Antonio Spurs, or Victor Wembanyama. Stats from ESPN.</p>
+        </footer>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="alerts-config.js"></script>
+    <script src="alerts.js"></script>
+  </body>
+</html>

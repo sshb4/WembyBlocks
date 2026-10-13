@@ -1,0 +1,27 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "wemby-block-alerts",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-09-14",
+  "compatibility_flags": ["nodejs_compat"],
+  "triggers": { "crons": ["* * * * *"] },
+  "vars": {
+    "ALERTS_ENABLED": "false",
+    "SIGNUPS_ENABLED": "false",
+    "SIGNUP_MODE": "waitlist",
+    "SITE_ORIGIN": "https://wembyblocks.com",
+    "MAX_WEB_SIGNUPS_PER_DAY": "100",
+    "ALERTS_START_AT": "",
+    "PUBLIC_URL": "",
+    "TWILIO_PHONE_NUMBER": "",
+    "SUPPORT_EMAIL": "ssh.b.designs@gmail.com",
+    "MAX_SUBSCRIBERS": "100",
+    "MAX_ALERTS_PER_MONTH": "5000"
+  },
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "wemby-block-alerts",
+    "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+    "migrations_dir": "migrations"
+  }]
+}
