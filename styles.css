@@ -963,6 +963,27 @@
           var(--panel-solid);
       }
 
+      .alerts-heading-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .coming-soon-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border: 1px solid rgba(201, 164, 92, 0.5);
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent-bright);
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
       .alerts-copy h2 {
         color: var(--accent);
         font-size: 2rem;
