@@ -55,6 +55,10 @@
         color: inherit;
       }
 
+      [tabindex="-1"]:focus {
+        outline: none;
+      }
+
       .visually-hidden {
         position: absolute;
         width: 1px;

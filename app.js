@@ -893,5 +893,21 @@
         resizeFrame = requestAnimationFrame(() => renderProjection(...lastProjectionArgs));
       });
 
+      // In-page links scroll to their section without adding #section to the URL.
+      document.addEventListener("click", (event) => {
+        const link = event.target.closest('a[href^="#"]');
+        if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) return;
+        const target = document.getElementById(link.getAttribute("href").slice(1));
+        if (!target) return;
+        event.preventDefault();
+        const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+        target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+        if (!target.matches("a, button, input, [tabindex]")) target.setAttribute("tabindex", "-1");
+        target.focus({ preventScroll: true });
+      });
+      if (window.location.hash) {
+        history.replaceState(null, "", window.location.pathname + window.location.search);
+      }
+
       scheduleAutoRefresh();
       loadData();
