@@ -816,7 +816,7 @@
           }
           if (profile) {
             els.playerAge.textContent = profile.age ?? "--";
-            els.playerTeam.textContent = `#${profile.jersey ?? "1"} · San Antonio Spurs`;
+            els.playerTeam.textContent = `Jersey #${profile.jersey ?? "1"} · San Antonio Spurs`;
           }
 
           const liveIds = progress?.liveIds || [];
