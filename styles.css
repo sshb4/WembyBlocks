@@ -420,10 +420,10 @@
       .hero-player-art {
         position: absolute;
         left: 28px;
-        bottom: -109px;
+        bottom: -157px;
         width: calc(100% + 24px);
-        height: calc(100% + 113px);
-        max-height: min(560px, calc(100% + 113px));
+        height: calc(100% + 161px);
+        max-height: min(620px, calc(100% + 161px));
         object-fit: contain;
         object-position: left bottom;
         filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.6));
@@ -1230,14 +1230,14 @@
         .hero-art-spot {
           grid-row: 2;
           min-height: 0;
-          height: clamp(200px, 45vw, 300px);
+          height: clamp(260px, 60vw, 380px);
         }
 
         .hero-player-art {
-          left: 50%;
-          bottom: -70px;
-          width: min(100%, 320px);
-          height: calc(100% + 60px);
+          left: calc(50% - 16px);
+          bottom: -100px;
+          width: min(125%, 430px);
+          height: calc(100% + 90px);
           max-height: none;
           object-position: center bottom;
           transform: translateX(-50%);
