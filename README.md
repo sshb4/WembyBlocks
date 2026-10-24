@@ -34,11 +34,11 @@ Run locally with any static server, for example `python3 -m http.server`, then o
 
 ## Block texts
 
-Optional SMS alerts (one text per regular-season block) run on a separate Cloudflare Worker in [`notifications/`](notifications/README.md). Signup stays closed until `alerts-config.js` points at that Worker.
+Optional SMS alerts (one text per regular-season block) run on a separate Cloudflare Worker in [`notifications/`](notifications/README.md). Pre-launch signup is open: the form saves consent in D1 without sending a text. Alerts remain disabled; activation requires a confirmation text and YES reply at launch.
 
 ## Questions?
 
-Contact [ssh.b.designs@gmail.com](mailto:ssh.b.designs@gmail.com).
+Contact [sashacbates@gmail.com](mailto:sashacbates@gmail.com).
 
 Read the [SMS terms](https://wembyblocks.com/sms-terms/) and [SMS privacy notice](https://wembyblocks.com/sms-privacy/).
 

@@ -313,7 +313,7 @@ test('prelaunch saves consent without Twilio credentials or active enrollment', 
   assert.match((await response.json()).message, /No text has been sent/);
   const saved = env.sqlite.prepare('SELECT * FROM signup_waitlist').get();
   assert.equal(saved.phone, phone); assert.equal(saved.created_at, now);
-  assert.equal(saved.terms_version, '2026-10-13'); assert.equal(saved.consent_source, 'web');
+  assert.equal(saved.terms_version, '2026-10-23'); assert.equal(saved.consent_source, 'web');
   assert.equal(row(env), undefined);
   await incoming(env, message('YES'), now + 1000);
   assert.equal(row(env), undefined);

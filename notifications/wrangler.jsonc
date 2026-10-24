@@ -3,25 +3,33 @@
   "name": "wemby-block-alerts",
   "main": "src/worker.js",
   "compatibility_date": "2026-09-14",
-  "compatibility_flags": ["nodejs_compat"],
-  "triggers": { "crons": ["* * * * *"] },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "triggers": {
+    "crons": [
+      "* * * * *"
+    ]
+  },
   "vars": {
     "ALERTS_ENABLED": "false",
-    "SIGNUPS_ENABLED": "false",
+    "SIGNUPS_ENABLED": "true",
     "SIGNUP_MODE": "waitlist",
     "SITE_ORIGIN": "https://wembyblocks.com",
     "MAX_WEB_SIGNUPS_PER_DAY": "100",
     "ALERTS_START_AT": "",
-    "PUBLIC_URL": "",
+    "PUBLIC_URL": "https://wemby-block-alerts.sashacbates.workers.dev",
     "TWILIO_PHONE_NUMBER": "",
-    "SUPPORT_EMAIL": "ssh.b.designs@gmail.com",
+    "SUPPORT_EMAIL": "sashacbates@gmail.com",
     "MAX_SUBSCRIBERS": "100",
     "MAX_ALERTS_PER_MONTH": "5000"
   },
-  "d1_databases": [{
-    "binding": "DB",
-    "database_name": "wemby-block-alerts",
-    "database_id": "REPLACE_WITH_D1_DATABASE_ID",
-    "migrations_dir": "migrations"
-  }]
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "wemby-block-alerts",
+      "database_id": "b4227a04-06de-4a40-85b6-3a9694191cc7",
+      "migrations_dir": "migrations"
+    }
+  ]
 }

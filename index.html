@@ -297,17 +297,16 @@
             <div class="alerts-copy">
               <div class="alerts-heading-row">
                 <h2 id="alerts-heading">Block alerts</h2>
-                <span class="coming-soon-badge">Coming soon</span>
               </div>
               <p>He blocks it. You get a text.</p>
               <p>SMS alerts are optional. View all the stats without an account, phone number, or text alerts.</p>
-              <p>Block texts are coming soon. Phone signup is not open yet; no numbers are being collected.</p>
+              <p>Alerts launch soon — sign up now and we'll text you a confirmation when they go live. Reply YES to activate.</p>
             </div>
             <form id="sms-form" class="sms-form" aria-describedby="sms-form-status sms-disclosure">
               <label for="sms-phone">Your phone number <span>(US only)</span></label>
               <div class="sms-form-row">
                 <input id="sms-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="25" placeholder="(210) 555-0123" aria-describedby="sms-form-status" />
-                <button id="sms-form-submit" class="sms-button" type="submit" disabled>Continue without texts</button>
+                <button id="sms-form-submit" class="sms-button" type="submit">Sign up for alerts</button>
               </div>
               <p id="sms-form-status" class="sms-form-status" role="status" aria-live="polite" aria-atomic="true" tabindex="-1">Enable JavaScript and complete the security check to save your signup request.</p>
               <label class="sms-consent" for="sms-consent">
@@ -316,6 +315,7 @@
               </label>
               <p id="sms-disclosure" class="sms-disclosure">After launch, reply YES to your confirmation text to activate. Frequency varies (about 3 texts per game day). Message and data rates may apply. STOP to cancel, HELP for help. <a href="sms-terms/">Terms</a> · <a href="sms-privacy/">Privacy</a></p>
               <div id="sms-turnstile"></div>
+              <p class="sms-skip"><button id="sms-form-skip" class="sms-button" type="button">Continue without texts</button></p>
               <noscript><p>Enable JavaScript to use this signup form.</p></noscript>
             </form>
           </section>

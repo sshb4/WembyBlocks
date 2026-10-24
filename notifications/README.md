@@ -4,9 +4,7 @@ The website stays on GitHub Pages. This separate Cloudflare Worker receives Twil
 
 ## Current state
 
-Not yet deployed for Wemby Blocks. This code was ported from the Wemby Blocks Worker (October 13, 2026): the MLB triple detector was replaced with an ESPN NBA block detector (`src/blocks.js`). A new Worker, D1 database, Twilio sender/campaign, and Turnstile widget are required before launch — do not reuse Corbin's, or Wemby signups would land in Corbin's subscriber list.
-
-The checked-in `wrangler.jsonc` keeps disabled/pre-launch defaults, an empty Twilio number, and a placeholder database ID.
+Deployed for pre-launch signup at `https://wemby-block-alerts.sashacbates.workers.dev`, with a dedicated D1 database and Turnstile widget for `wembyblocks.com`. `SIGNUPS_ENABLED=true` and `SIGNUP_MODE=waitlist` save phone number, server consent timestamp (`created_at`), and terms version without sending a text. `ALERTS_ENABLED=false`; Twilio sender credentials and launch confirmation delivery still need to be configured before alerts launch.
 
 Regular-season games only, US subscribers only. Default capacity: 100 active subscribers. Default automated alert limit: 5,000 attempted recipient messages per UTC calendar month. Signup replies and Twilio/carrier automatic replies are additional billable messages; this limit is not an account-wide spending cap. Configure Twilio billing alerts as well.
 
@@ -54,9 +52,9 @@ Enable Advanced Opt-Out. Set the opt-in keywords to **START and UNSTOP only; rem
 
 Suggested Advanced Opt-Out replies (replace the email):
 
-- START/UNSTOP: `Wemby Blocks: Messages unblocked. You are not subscribed. For help rejoining, contact ssh.b.designs@gmail.com.`
-- HELP/INFO: `Wemby Blocks: Help: ssh.b.designs@gmail.com. Reply STOP to cancel. Msg & data rates may apply.`
-- STOP: `Wemby Blocks: You are unsubscribed and will receive no more alerts. For help, contact ssh.b.designs@gmail.com.`
+- START/UNSTOP: `Wemby Blocks: Messages unblocked. You are not subscribed. For help rejoining, contact sashacbates@gmail.com.`
+- HELP/INFO: `Wemby Blocks: Help: sashacbates@gmail.com. Reply STOP to cancel. Msg & data rates may apply.`
+- STOP: `Wemby Blocks: You are unsubscribed and will receive no more alerts. For help, contact sashacbates@gmail.com.`
 
 Twilio handles blocking; the app also cancels pending deliveries when it receives an opt-out. Already-submitted messages may be in flight. START only unblocks delivery; it does not activate a subscription.
 

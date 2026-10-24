@@ -1,9 +1,8 @@
 // Public display settings only. Never put Twilio credentials in this file.
-// Signup stays closed until apiBaseUrl and turnstileSiteKey point at the
-// Wemby Blocks Worker and a Turnstile widget for wembyblocks.com.
+// Pre-launch signup saves consent; alerts require a later YES confirmation.
 window.WEMBY_ALERTS = {
   phoneNumber: '',
-  supportEmail: 'ssh.b.designs@gmail.com',
-  apiBaseUrl: '',
-  turnstileSiteKey: ''
+  supportEmail: 'sashacbates@gmail.com',
+  apiBaseUrl: 'https://wemby-block-alerts.sashacbates.workers.dev',
+  turnstileSiteKey: '0x4AAAAAAFjgZRtA7QTaFzMW'
 };
