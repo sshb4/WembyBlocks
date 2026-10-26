@@ -4,7 +4,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { readFileSync, readdirSync } from 'node:fs';
 import { webSignup, normalizeUSPhone } from '../src/signup.js';
 import twilio from 'twilio';
-import { incoming, handleRequest, recordEvents, dispatch, poll } from '../src/worker.js';
+import { incoming, handleRequest, recordEvents, dispatch, poll, cleanup, smsSegments } from '../src/worker.js';
 import { blockEvents } from '../src/blocks.js';
 
 function setup() {
@@ -129,6 +129,92 @@ test('repeated polling creates one delivery per subscriber; late joiners get no 
   await join(env, event.occurredAt + 1000, '+12025550124');
   await recordEvents(env, [event]);
   assert.equal(env.sqlite.prepare('SELECT COUNT(*) n FROM deliveries').get().n, 1);
+});
+
+const donationUrl = 'https://ko-fi.com/clipboardstats';
+const donationNudge = ' Help keep alerts free: ' + donationUrl;
+
+test('SMS segment counting covers GSM extensions, Unicode, and multipart boundaries', () => {
+  for (const [body, expected] of [
+    ['', 0], ['a'.repeat(160), 1], ['a'.repeat(161), 2],
+    ['a'.repeat(306), 2], ['a'.repeat(307), 3],
+    ['^{}\\[~]|€\f', 1], ['^'.repeat(80), 1], ['^'.repeat(81), 2],
+    ['é'.repeat(160), 1], ['“'.repeat(70), 1], ['“'.repeat(71), 2],
+    ['“'.repeat(134), 2], ['“'.repeat(135), 3],
+    ['🏀'.repeat(35), 1], ['🏀'.repeat(36), 2]
+  ]) assert.equal(smsSegments(body), expected, JSON.stringify(body));
+  const briefBody = 'Wemby Blocks: REJECTED. Block #628 of his career vs DAL. wembyblocks.com Reply STOP to unsubscribe.';
+  assert.equal(smsSegments(briefBody + donationNudge), 1);
+  for (const actual of blockEvents(fixture, occurred - 1000, lastBlock + 1000)) {
+    assert.match(actual.body, /^[\x20-\x7e]+$/);
+    assert.equal(smsSegments(actual.body + donationNudge), 1);
+  }
+});
+
+test('every fifth new stored block sends the nudge in the same alert; re-polls do not advance cadence', async t => {
+  const env = setup(); env.DONATION_URL = donationUrl;
+  await join(env, occurred - 1000);
+  const real = blockEvents(fixture, occurred - 1000, lastBlock + 1000)[0];
+  const events = Array.from({ length: 10 }, (_, i) => ({ ...real, id: `nudge:${i + 1}` }));
+  await recordEvents(env, events.slice(0, 5));
+  await recordEvents(env, events); // first five are duplicates
+  await recordEvents(env, events);
+  for (const [i, item] of events.entries()) {
+    const stored = env.sqlite.prepare('SELECT body FROM events WHERE id=?').get(item.id);
+    assert.equal(stored.body, real.body + ((i + 1) % 5 === 0 ? donationNudge : ''));
+  }
+  const sent = [];
+  t.mock.method(globalThis, 'fetch', async (_url, options) => {
+    sent.push(options.body.get('Body'));
+    return Response.json({ sid: 'SM' + 'd'.repeat(32) });
+  });
+  await dispatch(env, occurred + 1000); await dispatch(env, occurred + 2000);
+  assert.equal(sent.length, 10);
+  assert.equal(sent.filter(body => body.endsWith(donationNudge)).length, 2);
+  assert.ok(sent.every(body => smsSegments(body) === 1));
+});
+
+test('fifth-event nudge skips overflow by encoding and skips absent or Unicode donation URLs', async () => {
+  for (const [body, url, append] of [
+    ['a'.repeat(160 - donationNudge.length), donationUrl, true],
+    ['a'.repeat(161 - donationNudge.length), donationUrl, false],
+    ['^'.repeat(60), donationUrl, false], // fewer than 160 characters, over 160 septets
+    ['a'.repeat(60) + '🏀', donationUrl, false],
+    [event.body, undefined, false], [event.body, '', false], [event.body, 'https://example.com/“', false]
+  ]) {
+    const env = setup(); env.DONATION_URL = url;
+    await recordEvents(env, Array.from({ length: 5 }, (_, i) => ({ ...event, id: `guard:${i}`, body })));
+    assert.equal(env.sqlite.prepare('SELECT body FROM events WHERE id=?').get('guard:4').body,
+      body + (append ? donationNudge : ''));
+  }
+});
+
+test('an insert ignored after a racing duplicate check cannot rewrite the fifth stored alert', async () => {
+  const env = setup();
+  await recordEvents(env, Array.from({ length: 5 }, (_, i) => ({ ...event, id: `race:${i}` })));
+  env.DONATION_URL = donationUrl;
+  const prepare = env.DB.prepare;
+  env.DB.prepare = sql => {
+    const statement = prepare(sql);
+    if (sql === 'SELECT id FROM events WHERE id=?') statement.first = async () => null;
+    return statement;
+  };
+  await recordEvents(env, [{ ...event, id: 'race:4' }]);
+  assert.equal(env.sqlite.prepare('SELECT body FROM events WHERE id=?').get('race:4').body, event.body);
+  assert.equal(env.sqlite.prepare('SELECT COUNT(*) n FROM events').get().n, 5);
+});
+
+test('cleanup preserves donation cadence and confirmations never contain a nudge', async () => {
+  const env = setup(); env.DONATION_URL = donationUrl;
+  pending(env, occurred - 1000);
+  const confirmation = await incoming(env, message('YES'), occurred);
+  assert.match(confirmation, /You are in/);
+  assert.doesNotMatch(confirmation, /Help keep alerts free|ko-fi/);
+  await recordEvents(env, Array.from({ length: 4 }, (_, i) => ({ ...event, occurredAt: occurred, id: `old:${i}` })));
+  await cleanup(env, occurred + 91 * 86400000);
+  assert.equal(env.sqlite.prepare('SELECT COUNT(*) n FROM deliveries').get().n, 0);
+  await recordEvents(env, [{ ...event, id: 'after-cleanup' }]);
+  assert.equal(env.sqlite.prepare('SELECT body FROM events WHERE id=?').get('after-cleanup').body, event.body + donationNudge);
 });
 
 test('dispatch sends once; subsequent polls cannot repeat it', async t => {

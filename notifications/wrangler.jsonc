@@ -21,6 +21,7 @@
     "PUBLIC_URL": "https://wemby-block-alerts.sashacbates.workers.dev",
     "TWILIO_PHONE_NUMBER": "",
     "SUPPORT_EMAIL": "sashacbates@gmail.com",
+    "DONATION_URL": "https://ko-fi.com/clipboardstats",
     "MAX_SUBSCRIBERS": "100",
     "MAX_ALERTS_PER_MONTH": "5000"
   },

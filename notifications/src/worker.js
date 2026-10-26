@@ -4,6 +4,20 @@ import { webSignup } from './signup.js';
 
 const MINUTE = 60_000;
 const DAY = 24 * 60 * MINUTE;
+const DONATE_NUDGE_PREFIX = ' Help keep alerts free: ';
+const GSM_BASIC = new Set('@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !"#¤%&\'()*+,-./0123456789:;<=>?¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüà');
+const GSM_EXT = new Set('\f^{}\\[~]|€');
+
+export function smsSegments(text) {
+  let septets = 0;
+  for (const char of text) {
+    if (GSM_BASIC.has(char)) septets++;
+    else if (GSM_EXT.has(char)) septets += 2;
+    else return text.length <= 70 ? 1 : Math.ceil(text.length / 67);
+  }
+  return septets <= 160 ? (septets ? 1 : 0) : Math.ceil(septets / 153);
+}
+
 const STOP = new Set(['STOP', 'STOPALL', 'UNSUBSCRIBE', 'CANCEL', 'END', 'QUIT', 'REVOKE', 'OPTOUT']);
 const db = (env, sql, ...args) => env.DB.prepare(sql).bind(...args);
 const xml = text => new Response(`<?xml version="1.0" encoding="UTF-8"?><Response>${text ? `<Message>${text.replace(/[<>&"']/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[c])}</Message>` : ''}</Response>`, {
@@ -105,12 +119,20 @@ async function fetchJson(url) {
 }
 
 export async function recordEvents(env, events) {
+  const nudge = DONATE_NUDGE_PREFIX + (env.DONATION_URL || '');
+  const nudgeEnabled = Boolean(env.DONATION_URL) && [...nudge].every(char => GSM_BASIC.has(char) || GSM_EXT.has(char));
   for (const event of events) {
     if (await db(env, 'SELECT id FROM events WHERE id=?', event.id).first()) continue;
-    // Both statements commit together. A subscriber joining after the play never
-    // receives that old play; the delivery primary key also covers concurrent polls.
+    const nudged = event.body + nudge;
+    // Commit the final body and deliveries together. changes() refers to the
+    // immediately preceding insert, so a concurrent duplicate cannot add a nudge.
+    // Keep events for the lifetime cadence; cleanup only prunes old deliveries.
     await env.DB.batch([
       db(env, 'INSERT OR IGNORE INTO events(id,occurred_at,body) VALUES(?,?,?)', event.id, event.occurredAt, event.body),
+      ...(nudgeEnabled && smsSegments(nudged) === 1 ? [
+        db(env, `UPDATE events SET body=? WHERE id=? AND changes()=1
+          AND (SELECT COUNT(*) FROM events) % 5 = 0`, nudged, event.id)
+      ] : []),
       db(env, `INSERT OR IGNORE INTO deliveries(id,event_id,phone)
         SELECT lower(hex(randomblob(16))), ?, phone FROM subscribers
         WHERE status='active' AND confirmed_at<=?`, event.id, event.occurredAt)
